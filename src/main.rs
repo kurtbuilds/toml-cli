@@ -3,6 +3,7 @@ mod query_parser;
 use std::fs;
 use std::path::PathBuf;
 use std::str;
+use std::str::FromStr;
 
 use failure::{Error, Fail};
 use serde::ser::{Serialize, SerializeMap, Serializer, SerializeSeq};
@@ -187,7 +188,12 @@ fn set(path: PathBuf, query: &str, value_str: &str, opts: SetOpts) -> Result<(),
             }
         }
     }
-    *item = value(value_str);
+
+    println!("item: {:?}", item);
+    *item = bool::from_str(value_str).map(value).map_err(|_| ())
+        .or_else(|_| i64::from_str(value_str).map(value).map_err(|_| ()))
+        .unwrap_or_else(|_| value(value_str));
+    println!("item: {:?}", item);
 
     if opts.dry {
         print!("{}", doc.to_string());
