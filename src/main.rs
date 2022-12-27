@@ -42,9 +42,9 @@ enum Args {
 
 #[derive(StructOpt)]
 struct SetOpts {
-    /// Edit the file in place
+    /// Print the file instead of editing in place
     #[structopt(long, short)]
-    in_place: bool,
+    dry: bool,
 }
 
 #[derive(StructOpt)]
@@ -189,10 +189,10 @@ fn set(path: PathBuf, query: &str, value_str: &str, opts: SetOpts) -> Result<(),
     }
     *item = value(value_str);
 
-    if opts.in_place {
-        fs::write(&path, doc.to_string())?;
-    } else {
+    if opts.dry {
         print!("{}", doc.to_string());
+    } else {
+        fs::write(&path, doc.to_string())?;
     }
     Ok(())
 }
